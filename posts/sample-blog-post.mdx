@@ -1,0 +1,214 @@
+---
+title: sample blog post
+description: Use MDX, RSC, and Bright to build a blog with Next.js 13.
+slug: sample-blog-post-next-13
+date: Aug 24, 2023
+---
+
+I've been tinkering with this website and the [Next.js 13 App Router](https://beta.nextjs.org) for a while now,
+and it's been a great experience, especially in the last few months. But I've seen some confusion around
+how to use the new features and React Server Components, so I wrote up an outline on building this website.
+
+To address the React-sized elephant in the room:
+you do not need this fancy setup to build a blog.
+HTML and CSS may be a better choice for you, but I'd find little fun in that, and I'm a strong believer in having a website to experiment with.
+
+To set a few expectations, here's what this post **won't** do:
+
+- Act as documentation for Next.js or React
+- Be a 100% code-complete tutorial. You'll need to fill in some gaps yourself.
+  - You can always reference [this website's source code](https://github.com/maxleiter/maxleiter.com).
+  - There are file trees included with links to the source code.
+
+And here's what it **will** do:
+
+- Show you real-world examples involving React Server Components and the App Router.
+- Guide you in spinning up your own blog with Next.js 13 and React Server Components with great SEO and performance.
+  - I say static first because while you can opt into [dynamic rendering](https://beta.nextjs.org/docs/rendering/static-and-dynamic-rendering) everything presented here can result in a fully static no-JavaScript site.
+- Demonstrate how to enable writing in markdown with [MDX](https://mdxjs.com/) and [next-mdx-remote/rsc](https://github.com/hashicorp/next-mdx-remote#react-server-components-rsc--nextjs-app-directory-support)
+  - We'll use [Bright](https://github.com/code-hike/bright) for server-side syntax highlighting.
+- Act as a launching point for your own experimentation and exploration.
+
+Now that that's out of the way:
+
+
+## sample
+
+## Set up the project
+
+First, we'll need to create a new Next.js project. You can launch the setup wizard with `npx create-next-app`:
+
+```bash
+npx create-next-app --experimental-app
+```
+
+<Note>
+  If you want to migrate an existing project, refer to the [Next.js installation
+  documentation](https://beta.nextjs.org/docs/installation).
+</Note>
+
+Hit `y` (or `n`, I'm not your boss) a few times to complete the wizard.
+
+## File structure
+
+The easiest way I've found to thinking about structuring App Router applications is from a top-down approach.
+Think of your general path structure, then start with your highest level 'scope' (layout) and work your way down.
+
+In our case, we'll have a [home page](/). Let's also add a [projects page](/projects) and an [about page](/about).
+We'll cover the blog in the next section.
+
+In general, a page will look like this:
+
+```tsx
+// page.tsx
+export default function Page() {
+  return <>Your content here</>
+}
+```
+
+In my case, the three pages we're making all look the same minus their content, so they seem like a strong candidate for sharing a layout.
+
+A Layout will look something like this:
+
+```tsx
+// layout.tsx
+export default function Layout({ children }: PropsWithChildren) {
+  return (
+    <>
+      // Your layout content here
+      {children}
+      // Or here
+    </>
+  )
+}
+```
+
+Knowing all of this, I chose to create four files: `app/layout.tsx`, `app/page.tsx`, `app/projects/page.tsx`, and `app/about/page.tsx`.
+The layout will apply to all pages, and each page file will contain it's own content.
+
+I ran into one small issue with this approach: the home page doesn't need a <span style={{ position: 'relative', top: 4 }}><HomeIcon /></span> icon, but the other pages do.
+It doesn't make much sense to include that in the home page, but all the other pages should have it,
+so we'll keep it out of the root layout and create a [Route Group](https://beta.nextjs.org/docs/routing/defining-routes#route-groups) with it's own nested layout layout to only apply to the other pages.
+
+First, lets create our `app/(subpages)/components` directory and create a quick header only for the subpages:
+
+```tsx
+// app/(subpages)components/header.tsx
+import Link from 'next/link'
+import { HomeIcon } from 'react-feather'
+
+export default function Header() {
+  return (
+    <header>
+      <Link href="/">
+        <HomeIcon />
+      </Link>
+      // If you want to add a Client Component here like a theme switcher, mark that
+      // component with "use client" and leave the majority of the header as an RSC
+    </header>
+  )
+}
+```
+
+And use it in our `app/(subpages)/layout.tsx`:
+
+```tsx
+// app/(subpages)/layout.tsx
+import Header from './components/header'
+
+export default function SubLayout({ children }) {
+  return (
+    <>
+      <Header />
+      {children}
+    </>
+  )
+}
+```
+
+With the header in place, you now have a nested layout for subpages and blog posts.
+
+Let's go ahead and create our files and directories:
+
+<Note>
+  You can click any of the files in a file tree to view the source code on
+  GitHub.
+</Note>
+
+<FileTree>
+  <Folder name="app" open>
+    <Folder 
+      name="components" 
+      open 
+      note="contains our general components" 
+    >
+    </Folder>
+    <File
+      name="layout.tsx"
+      type="layout"
+      note="contains our <head> and <body>"
+      url="https://github.com/MaxLeiter/maxleiter.com/blob/master/app/layout.tsx"
+    />
+    <File
+      name="page.tsx"
+      type="page"
+      note="contains our Home Page"
+      url="https://github.com/MaxLeiter/maxleiter.com/blob/master/app/page.tsx"
+    />
+    <Folder
+      name="(subpages)"
+      open
+      note="route groups aren't included in the URL"
+    >    
+      <Folder 
+        name="components" 
+        open
+      >
+        <File 
+          name="header.tsx" 
+          type="component" 
+          url="https://github.com/MaxLeiter/maxleiter.com/blob/master/app/(subpages)/components/header.tsx"
+          note="<Header />"
+        />
+      </Folder>
+      <File 
+        name="layout.tsx" 
+        type="layout" 
+        note="contains our <Header />" 
+        url="https://github.com/MaxLeiter/maxleiter.com/blob/master/app/(subpages)/layout.tsx" 
+      />
+      <Folder name="about" open>
+        <File 
+          name="page.tsx" 
+          type="page" 
+          url="https://github.com/MaxLeiter/maxleiter.com/blob/master/app/(subpages)/about/page.tsx"
+          />
+      </Folder>
+      <Folder name="projects">
+        <File 
+          name="page.tsx" 
+          type="page"
+          url="https://github.com/MaxLeiter/maxleiter.com/blob/master/app/(subpages)/projects/page.tsx" />
+      </Folder>
+    </Folder>
+
+  </Folder>
+</FileTree>
+
+## sample
+<div style={{ margin: 'auto', maxWidth: '500px', height: '300px' }}>
+  <iframe
+    style={{
+      width: '100%',
+      height: '100%',
+    }}
+    src="https://www.youtube.com/embed/M6DS9Gyf2LM"
+    title="YouTube video player"
+    frameBorder="0"
+    allow="clipboard-write; encrypted-media; picture-in-picture; web-share"
+    allowFullScreen
+  ></iframe>
+</div>
+<small style={{ display: 'block', textAlign: 'center' }}>
+  <i>"the true touch typing experience"</i>
+</small>
