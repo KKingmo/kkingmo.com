@@ -18,9 +18,21 @@ const thirdPartyPosts: Post[] = [
   //   href: 'https://nextjs.org/',
   // },
 ]
+// todo
+// async function getMenuPosts(dir: string[]): Promise<string[]> {
+//   const nestPosts = await Promise.all(
+//     dir.map(async (menu) => {
+//       const result = await fs.readdir(`./posts/${menu}`)
+//       return result.map((el) => (menu ? `${menu}/${el}` : el))
+//     }),
+//   )
+//   return nestPosts.flat()
+// }
 
 export const getPosts = cache(async (includeThirdPartyPosts?: boolean) => {
-  const posts = await fs.readdir('./posts/')
+  // const posts = await getMenuPosts(['', 'next-13'])
+  const posts = await fs.readdir(`./posts/`)
+
   const postsWithMetadata = await Promise.all(
     posts
       .filter(
@@ -34,38 +46,7 @@ export const getPosts = cache(async (includeThirdPartyPosts?: boolean) => {
         if (data.published === false) {
           return null
         }
-        const withoutLeadingChars = filePath.substring(2).replace('.mdx', '.md')
-
-        const fetchUrl = `${process.env.GITHUB_REPO}/commits?path=${withoutLeadingChars}&page=1&per_page=1`
-
-        const commitInfoResponse = await fetch(fetchUrl, {
-          headers: {
-            Authorization: process.env.GITHUB_TOKEN ?? '',
-          },
-        })
-        const commitInfo = await commitInfoResponse.json()
-        let lastModified = 0
-        if (commitInfo?.length) {
-          lastModified = new Date(commitInfo[0].commit.committer.date).getTime()
-
-          if (
-            lastModified - new Date(data.date).getTime() <
-            24 * 60 * 60 * 1000
-          ) {
-            lastModified = 0
-          }
-        }
-
-        // let views = 0
-
-        // const { data: viewCount } = await supabase
-        //   .from('analytics')
-        //   .select('view_count')
-        //   .filter('slug', 'eq', `/blog/${data.slug}`)
-
-        // if (viewCount?.length) {
-        //   views = viewCount[0].view_count
-        // }
+        const lastModified = 0
 
         return { ...data, body: content, lastModified } as Post
       }),
