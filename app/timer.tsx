@@ -21,44 +21,8 @@ const timeStringOptions: Intl.DateTimeFormatOptions[] = [
     second: 'numeric',
     hour12: true,
     timeZoneName: 'short',
-    formatMatcher: 'basic',
-  },
-  {
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: true,
-    timeZoneName: 'short',
-    formatMatcher: 'best fit',
-  },
-  {
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: true,
-    timeZoneName: 'short',
     formatMatcher: 'best fit',
     weekday: 'long',
-  },
-  {
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: true,
-    timeZoneName: 'short',
-    formatMatcher: 'best fit',
-    weekday: 'long',
-    era: 'long',
-  },
-  {
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: true,
-    timeZoneName: 'short',
-    formatMatcher: 'best fit',
-    weekday: 'long',
-    era: 'long',
     year: 'numeric',
   },
   {
@@ -90,7 +54,7 @@ const TimeOfDay = () => {
       type="button"
       aria-label="Time of day"
     >
-      Seoul: <MemoTimeDisplay format={format} />
+      Seoul : <MemoTimeDisplay format={format} />
     </button>
   )
 }

@@ -12,7 +12,11 @@ export default async function ({
 }: {
   params: { slug: string }
 }): Promise<ImageResponse> {
-  const res = await fetch(`http://localhost:3000/posts/${params.slug}.mdx`)
+  const baseUrl =
+    process.env.NODE_ENV === 'production'
+      ? process.env.BASE_URL
+      : 'http://localhost:3000'
+  const res = await fetch(`${baseUrl}/posts/${params.slug}.mdx`)
 
   if (!res.ok) {
     return new Response('Not found', { status: 404 })

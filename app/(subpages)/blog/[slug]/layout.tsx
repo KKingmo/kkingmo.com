@@ -21,7 +21,7 @@ export const generateMetadata = async ({
     title: post?.title,
     description: post?.description,
     alternates: {
-      canonical: `https://kkingmo.com/blog/${params.slug}`,
+      canonical: `${process.env.BASE_URL}/blog/${params.slug}`,
     },
   }
 }

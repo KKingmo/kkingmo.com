@@ -11,7 +11,7 @@ export function MDXImage({
   alt: string
 }) {
   let widthFromSrc, heightFromSrc
-  const url = new URL(src, 'https://kkingmo.com')
+  const url = new URL(src, process.env.BASE_URL)
   const widthParam = url.searchParams.get('w') || url.searchParams.get('width')
   const heightParam =
     url.searchParams.get('h') || url.searchParams.get('height')

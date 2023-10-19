@@ -46,7 +46,7 @@ const ThemeSwitcher = ({
             {activeTheme === 'light' ? (
               <Moon size={iconSize} strokeWidth={strokeWidth || 2} />
             ) : (
-              <Sun size={iconSize} strokeWidth={strokeWidth || 1} />
+              <Sun size={iconSize} strokeWidth={strokeWidth || 2} />
             )}
           </button>
         </FadeIn>

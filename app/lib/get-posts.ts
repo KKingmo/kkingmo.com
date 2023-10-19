@@ -6,22 +6,22 @@ import { cache } from 'react'
 // import supabase from '@lib/supabase/private'
 
 const thirdPartyPosts: Post[] = [
-  {
-    title: 'Next 13 homepage',
-    description: 'next-13-homepage',
-    body: '',
-    date: '2023-08-24T13:00:00.000Z',
-    slug: '',
-    tags: [],
-    lastModified: 0,
-    isThirdParty: true,
-    href: 'https://nextjs.org/',
-  },
+  // {
+  //   title: 'Next 13 homepage',
+  //   description: 'next-13-homepage',
+  //   body: '',
+  //   date: '2023-08-24T13:00:00.000Z',
+  //   slug: '',
+  //   tags: [],
+  //   lastModified: 0,
+  //   isThirdParty: true,
+  //   href: 'https://nextjs.org/',
+  // },
 ]
 
 export const getPosts = cache(async (includeThirdPartyPosts?: boolean) => {
   const posts = await fs.readdir('./posts/')
-
+  console.log(posts)
   const postsWithMetadata = await Promise.all(
     posts
       .filter(
@@ -37,10 +37,7 @@ export const getPosts = cache(async (includeThirdPartyPosts?: boolean) => {
         }
         const withoutLeadingChars = filePath.substring(2).replace('.mdx', '.md')
 
-        const fetchUrl =
-          process.env.NODE_ENV === 'production'
-            ? `http://localhost:3000/mock-commit-response.json`
-            : `http://localhost:3000/mock-commit-response.json`
+        const fetchUrl = `${process.env.GITHUB_REPO}/commits?path=${withoutLeadingChars}&page=1&per_page=1`
 
         const commitInfoResponse = await fetch(fetchUrl, {
           headers: {
