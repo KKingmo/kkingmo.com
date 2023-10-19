@@ -21,7 +21,6 @@ const thirdPartyPosts: Post[] = [
 
 export const getPosts = cache(async (includeThirdPartyPosts?: boolean) => {
   const posts = await fs.readdir('./posts/')
-  console.log(posts)
   const postsWithMetadata = await Promise.all(
     posts
       .filter(
